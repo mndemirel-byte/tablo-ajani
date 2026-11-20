@@ -9,6 +9,9 @@ Kanıt izi: okuma betikleri başarıyla bitince work/erisim.jsonl dosyasına kay
 (scripts/_kayit.py). yeni_istek() her kullanıcı mesajında sayacı sıfırlar; böylece
 kontrol oturum başına değil, istek başına yapılır.
 
+Hook kararları terminale "[hook] ..." satırıyla yazılır; transkript okunurken bir aracın
+reddedildiği ya da bir cevabın geri çevrildiği böylece görülür.
+
 Not: Bu hook'lar bir güvenlik sınırı değildir; agent'ı doğru yola iten
 geri bildirim mekanizmalarıdır. Güvenlik sınırı sandbox'tır (bkz. README).
 """
@@ -19,7 +22,7 @@ from pathlib import Path
 
 from scripts._kayit import kayit_sayisi
 
-KOK = Path(__file__).parent
+KOK = Path(__file__).resolve().parent
 OKUMA_BETIKLERI = ("scripts/sayfa_bilgisi.py", "scripts/aralik_oku.py",
                    "scripts/sqlite_aktar.py", "scripts/sql.py", "scripts/dogrula.py")
 
@@ -46,7 +49,7 @@ class Kancalar:
     async def yazim_sonrasi(self, girdi, tool_use_id, baglam):
         dosya = girdi["tool_input"].get("dosya", "")
         sonuc = subprocess.run([sys.executable, "scripts/dogrula.py", dosya],
-                               cwd=KOK, capture_output=True, text=True)
+                               cwd=KOK, capture_output=True, text=True, encoding="utf-8")
         durum = "temiz" if sonuc.returncode == 0 else "SORUN VAR"
         return {"hookSpecificOutput": {
             "hookEventName": "PostToolUse",
@@ -57,6 +60,7 @@ class Kancalar:
         if girdi.get("stop_hook_active"):      # ikinci kez engelleme: sonsuz döngüye girme
             return {}
         if kayit_sayisi() <= self.istek_baslangici:   # bu istekte başarılı veri erişimi yok
+            print("  [hook] durma reddedildi: bu istekte veri erişimi yok")
             return {"decision": "block",
                     "reason": "Bu istekte tablodaki veriye bakmadın. Soru tabloyla ilgiliyse önce "
                               "scripts/ altındaki betiklerle veriyi oku, sonra cevap ver."}
@@ -64,6 +68,7 @@ class Kancalar:
 
     @staticmethod
     def _reddet(neden: str) -> dict:
+        print(f"  [hook] reddedildi: {neden}")   # hook kararları transkriptte görünsün
         return {"hookSpecificOutput": {
             "hookEventName": "PreToolUse",
             "permissionDecision": "deny",

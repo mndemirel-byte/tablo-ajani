@@ -15,7 +15,7 @@ from openpyxl import load_workbook
 
 from scripts.dogrula import dogrula
 
-KOK = Path(__file__).parent
+KOK = Path(__file__).resolve().parent
 YEDEKLER = KOK / "work" / "yedekler"
 AZAMI_HUCRE = 50  # tek çağrıda yazılabilecek hücre sayısı; aşılırsa agent'a geri bildirim
 

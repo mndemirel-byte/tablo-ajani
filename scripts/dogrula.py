@@ -43,11 +43,12 @@ def dogrula(yol: str) -> list[dict]:
 
 
 if __name__ == "__main__":
+    from _kayit import kaydet, utf8_cikti
+    utf8_cikti()
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("dosya")
     a = p.parse_args()
     s = dogrula(a.dosya)
     print(json.dumps({"sorun_sayisi": len(s), "sorunlar": s}, ensure_ascii=False, indent=2))
-    from _kayit import kaydet
     kaydet("dogrula", a.dosya)
     sys.exit(1 if s else 0)

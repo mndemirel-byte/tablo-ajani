@@ -8,6 +8,8 @@ import json
 import sqlite3
 
 if __name__ == "__main__":
+    from _kayit import kaydet, utf8_cikti
+    utf8_cikti()
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("db")
     p.add_argument("sorgu")
@@ -16,5 +18,4 @@ if __name__ == "__main__":
     imlec = con.execute(a.sorgu)
     kolonlar = [d[0] for d in imlec.description or []]
     print(json.dumps([dict(zip(kolonlar, r)) for r in imlec.fetchall()], ensure_ascii=False, indent=2))
-    from _kayit import kaydet
     kaydet("sql", a.sorgu)

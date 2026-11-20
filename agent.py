@@ -13,6 +13,7 @@ makinenizde çalıştırın. TABLO_SANDBOX=1 ile SDK'nın bash sandbox'ı açıl
 """
 import asyncio
 import os
+import sys
 from pathlib import Path
 
 from claude_agent_sdk import (
@@ -23,7 +24,7 @@ from claude_agent_sdk import (
 from araclar import tablo_sunucusu
 from kancalar import Kancalar, komut_ozeti
 
-KOK = Path(__file__).parent
+KOK = Path(__file__).resolve().parent
 YAZMA_ARACLARI = {"mcp__tablo__hucre_yaz", "mcp__tablo__geri_al"}
 
 DENETCI = AgentDefinition(
@@ -31,7 +32,9 @@ DENETCI = AgentDefinition(
                 "denetler. Bir yazma işleminden sonra ve sayısal bir sonuç bildirmeden önce çağır.",
     prompt="Sen şüpheci bir finans denetçisisin. Önündeki iş deneyimsiz bir analistin elinden çıktı. "
            "Sonuca güvenme: scripts/ altındaki betiklerle veriyi kendin oku, toplamları kendin hesapla. "
-           "Bulduğun her tutarsızlığı hücre adresiyle listele. Hiçbir şeyi değiştirme; yalnızca raporla.",
+           "Bulduğun her tutarsızlığı hücre adresiyle listele. Hiçbir şeyi değiştirme; yalnızca raporla. "
+           "Kontrol noktaları (work/yedekler/) dahil her xlsx dosyasını yalnızca scripts/ altındaki betiklerle "
+           "oku; openpyxl'i doğrudan çağırma. work/ altına geçici dosya bırakma.",
     tools=["Bash", "Read", "Grep", "Glob"],
 )
 
@@ -101,4 +104,5 @@ async def main() -> None:
 
 
 if __name__ == "__main__":
+    sys.stdout.reconfigure(encoding="utf-8")   # Windows'ta Türkçe çıktı için
     asyncio.run(main())

@@ -22,21 +22,28 @@ DOSYA = "data/kuzey_elektronik.xlsx"
 
 
 def calistir(*arg):
-    return subprocess.run([sys.executable, *arg], cwd=KOK, capture_output=True, text=True)
+    return subprocess.run([sys.executable, *arg], cwd=KOK, capture_output=True, text=True, encoding="utf-8")
+
+
+def json_cikti(*arg):
+    """Betiği çalıştırır, JSON çıktısını döndürür; betik hata verdiyse stderr'i gösterir."""
+    s = calistir(*arg)
+    assert s.stdout.strip(), f"{arg[0]} çıktı üretmedi (çıkış kodu {s.returncode}):\n{s.stderr}"
+    return json.loads(s.stdout)
 
 
 def test_betikler():
     assert calistir("data/ornek_olustur.py").returncode == 0
-    harita = json.loads(calistir("scripts/sayfa_bilgisi.py", DOSYA).stdout)
+    harita = json_cikti("scripts/sayfa_bilgisi.py", DOSYA)
     assert [s["ad"] for s in harita["sayfalar"]] == ["Gelir", "Gider", "Ozet"]
-    assert json.loads(calistir("scripts/aralik_oku.py", DOSYA, "Gelir!D5").stdout)["degerler"] == [[905000]]
+    assert json_cikti("scripts/aralik_oku.py", DOSYA, "Gelir!D5")["degerler"] == [[905000]]
     aktarim = calistir("scripts/sqlite_aktar.py", DOSYA, "work/kitap.db")
     assert aktarim.returncode == 0 and "UYARI" in aktarim.stdout and "Gider!C4" in aktarim.stdout
     # SQLite'ın sessiz hatası: "210.000" metni 210.0 olarak toplanır (doğrusu 2.642.000)
-    yanlis = json.loads(calistir("scripts/sql.py", "work/kitap.db", 'SELECT SUM("2025") AS t FROM Gider').stdout)
+    yanlis = json_cikti("scripts/sql.py", "work/kitap.db", 'SELECT SUM("2025") AS t FROM Gider')
     assert yanlis == [{"t": 2432210.0}]
-    satir = json.loads(calistir("scripts/sql.py", "work/kitap.db",
-                                'SELECT SUM("2026") AS t FROM Gelir').stdout)
+    satir = json_cikti("scripts/sql.py", "work/kitap.db",
+                                'SELECT SUM("2026") AS t FROM Gelir')
     assert satir == [{"t": 4870000}]
     assert calistir("scripts/sql.py", "work/kitap.db", "DELETE FROM Gelir").returncode != 0  # salt okunur
     d = calistir("scripts/dogrula.py", DOSYA)
@@ -91,6 +98,7 @@ def test_secenekler():
 
 
 if __name__ == "__main__":
+    sys.stdout.reconfigure(encoding="utf-8")   # Windows'ta yönlendirilmiş çıktı için
     test_betikler()
     asyncio.run(test_araclar())
     asyncio.run(test_kancalar())

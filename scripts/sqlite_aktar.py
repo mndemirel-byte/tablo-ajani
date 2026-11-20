@@ -43,6 +43,8 @@ def aktar(xlsx: str, db: str) -> tuple[list[str], list[str]]:
 
 
 if __name__ == "__main__":
+    from _kayit import utf8_cikti
+    utf8_cikti()
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("xlsx")
     p.add_argument("db")

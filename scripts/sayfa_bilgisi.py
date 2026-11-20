@@ -28,10 +28,11 @@ def harita(yol: str, satir: int = 5) -> dict:
 
 
 if __name__ == "__main__":
+    from _kayit import kaydet, utf8_cikti
+    utf8_cikti()
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("dosya")
     p.add_argument("--satir", type=int, default=5, help="Her sayfadan kaç satır gösterilsin")
     a = p.parse_args()
     print(json.dumps(harita(a.dosya, a.satir), ensure_ascii=False, indent=2, default=str))
-    from _kayit import kaydet
     kaydet("sayfa_bilgisi", a.dosya)

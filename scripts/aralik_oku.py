@@ -27,10 +27,11 @@ def oku(yol: str, aralik: str) -> dict:
 
 
 if __name__ == "__main__":
+    from _kayit import kaydet, utf8_cikti
+    utf8_cikti()
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("dosya")
     p.add_argument("aralik")
     a = p.parse_args()
     print(json.dumps(oku(a.dosya, a.aralik), ensure_ascii=False, indent=2, default=str))
-    from _kayit import kaydet
     kaydet("aralik_oku", f"{a.dosya} {a.aralik}")

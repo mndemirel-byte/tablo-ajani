@@ -73,5 +73,13 @@ kullanıcı başına yalıtılmış çalışma dizini, uygulama düzeyinde maliy
 
 ## Durum
 
-Çevrimdışı testler (`testler/test_cevrimdisi.py`) `claude-agent-sdk` 0.2.186 ile geçer.
-Modelle uçtan uca çalıştırma henüz yapılmadı.
+- Çevrimdışı testler (`testler/test_cevrimdisi.py`) `claude-agent-sdk` 0.2.186 ile geçer.
+- Agent modelle iki kısa oturumda uçtan uca çalıştırıldı (20 Kasım 2026, Windows).
+  Doğrulananlar: özel tool'lar görünüyor, onay sorusu `hucre_yaz` ve `geri_al` için terminale düşüyor,
+  `denetci` çağrılıyor, Stop hook'u veriye bakılmayan cevabı geri çeviriyor, geri alma çalışıyor,
+  `xlsx_koruma` subagent içinde de çalışıp denetçinin doğrudan openpyxl komutunu reddediyor,
+  iki düzeltmeden sonra `dogrula.py` sıfır sorun buluyor.
+- Henüz sınanmayanlar: SQLite yolu (agent hiç kullanmadı), otomatik geri alınan bir yazma,
+  `TABLO_SANDBOX=1`. Denetçi talimatındaki son ek (yedekleri betiklerle oku, geçici dosya bırakma)
+  ikinci oturumdan sonra eklendi.
+- Birkaç oturum kanıt değildir; model ya da SDK sürümü değişince davranış değişebilir.
